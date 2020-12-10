@@ -10,7 +10,24 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: CopyFiles@2
+  displayName: "Copy Files to: $(build.artifactstagingdirectory)"
+  inputs:
+    SourceFolder: $(system.defaultworkingdirectory)
+    Contents: '**/*.war'
+    TargetFolder: $(build.artifactstagingdirectory)
+
 - task: Maven@3
+- task: Veracode Flaw Importer@3
+  inputs:
+    ConnectionDetailsSelection: 'Endpoint'
+    AnalysisService: 'Veracode Upload & Scan'
+    veracodeAppProfile: 'Sample Git'
+    sandboxName: 
+    importType: 'All Unmitigated Flaws Violating Policy'
+    workItemType: 'Bug'
+    area: '$(system.teamProject)'
+    flawImportLimit: '1000'
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
