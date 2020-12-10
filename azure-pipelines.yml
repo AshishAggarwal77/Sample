@@ -10,12 +10,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: CopyFiles@2
-  displayName: "Copy Files to: $(build.artifactstagingdirectory)"
-  inputs:
-    SourceFolder: $(system.defaultworkingdirectory)
-    Contents: '**/*.war'
-    TargetFolder: $(build.artifactstagingdirectory)
 
 - task: Maven@3
 - task: Veracode Flaw Importer@3
