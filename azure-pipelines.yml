@@ -12,16 +12,6 @@ pool:
 steps:
 
 - task: Maven@3
-- task: Veracode Flaw Importer@3
-  inputs:
-    ConnectionDetailsSelection: 'Endpoint'
-    AnalysisService: 'Veracode Upload & Scan'
-    veracodeAppProfile: 'Sample Git'
-    sandboxName: 
-    importType: 'All Unmitigated Flaws Violating Policy'
-    workItemType: 'Bug'
-    area: '$(system.teamProject)'
-    flawImportLimit: '1000'
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
@@ -31,3 +21,24 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+
+- task: CopyFiles@2
+  displayName: "Copy Files to: $(build.artifactstagingdirectory)"
+  inputs:
+    SourceFolder: $(system.defaultworkingdirectory)
+    Contents: '**/*.war'
+    TargetFolder: $(build.artifactstagingdirectory)
+
+- task: Veracode@3
+  inputs:
+    ConnectionDetailsSelection: 'Endpoint'
+    AnalysisService: 'Veracode Upload & Scan'
+    veracodeAppProfile: 'Sample Git'
+    version: '$(build.buildNumber)'
+    filepath: '$(build.artifactstagingdirectory)'
+    createSandBox: false
+    createProfile: false
+    failTheBuildIfVeracodeScanDidNotInitiate: false
+    scanStatusCheckInterval: '60'
+    importResults: false
+    failBuildOnPolicyFail: false
